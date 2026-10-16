@@ -1,0 +1,10 @@
+work/
+.env
+.env.*
+!.env.example
+node_modules/
+supabase/.temp/
+supabase/.branches/
+*.log
+.DS_Store
+Thumbs.db
