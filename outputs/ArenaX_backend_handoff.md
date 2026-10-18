@@ -94,6 +94,8 @@ Tests exercised database authorization using simulated JWT claims under actual d
 
 ## Existing security follow-up
 
+Update October 18, 2026: the historical findings below are superseded by [Migration 018 verification](018_security_and_website_roadmap.md). Anonymous function exposure and the tested registration/profile/team field vulnerabilities are now addressed. Eleven authenticated function exposure warnings and disabled leaked-password protection remain.
+
 No new advisor warnings remain for this module. Pre-existing findings remain:
 - 15 public security-definer functions callable by anon; 15 callable by authenticated. These are exposure warnings requiring function-by-function authorization review, not proof that all calls can modify data. [Supabase guidance](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable)
 - Leaked-password protection is disabled. [Supabase guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)

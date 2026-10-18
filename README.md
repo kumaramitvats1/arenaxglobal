@@ -1,31 +1,33 @@
 # ArenaX Global
 
-Backend work for the ArenaX Global sports events MVP, shared by the future mobile and web applications.
+Shared Supabase backend for the web and mobile MVP. No frontend is included yet.
 
-## Included
+## Current status
 
-- `supabase/migrations/`: exact SQL exports of applied migrations 017 and 017B, using their recorded database versions.
-- `outputs/016B_assign_and_validate_scorer.sql`: development account conversion and permission assertions.
-- `outputs/017_verification.sql`: 35 transactional check-in tests; fixtures and temporary permissions roll back.
-- [Backend handoff](outputs/ArenaX_backend_handoff.md): API usage, security rules, verification results, and follow-up items.
-- [Applied migration export](outputs/Applied_017_export.md): reviewable record of the deployed SQL.
+Migration 018 is applied to arenax-dev. On October 18, 2026, all 76 database checks passed locally and live: 35 check-in tests and 41 sensitive-field/authorization tests. Existing application data checksums were unchanged. The completed tournament, 15 matches and Bihar championship remain intact.
 
-## Current milestone
+- 016B: Hotmail development account converted from captain to event SCORER.
+- 017/017B: authorized manual/QR check-in, attendance audit and private hashed tokens.
+- 018: server-enforced registration/payment/profile/team field protection, active-account permission helpers, reduced anonymous and maintenance privileges.
 
-Migration 016B validated the event scorer's permissions. Migration 017 added server-authorized manual and QR participant check-in, attendance auditing, and RLS. Migration 017B made private QR-token isolation explicit.
+## Test locally
 
-Last database verification: September 20, 2026. All 35 check-in tests passed. The original tournament remained completed with 15 completed matches and Bihar as champion. Publishing this repository does not rerun or change the database.
+Use Node.js 22 or later: run `npm ci`, then `npm test`.
 
-## Database baseline
+Tests restore the legacy schema and replay all migrations in isolated PGlite PostgreSQL, then run both rollback-only SQL suites. No cloud credentials are needed. Tests simulate database roles and JWT claims; they do not test Supabase Auth sign-in, HTTP transport, browser UI or concurrent connections.
 
-This repository is an incremental handoff, not yet a complete database bootstrap. Migrations 001 through 016A were previously run through Supabase SQL Editor and are not captured here as migration files. The included migrations depend on that existing schema and authorization helpers.
+## Database bootstrap
 
-The two timestamped migrations are already applied to `arenax-dev`. Do not rerun them there or reset the database from this incomplete migration set. Capture and reconcile the earlier baseline before configuring automated database deployment or creating a fresh database from this repository.
+`supabase/baselines/legacy_through_016.sql` reconstructs the legacy application schema from metadata captured October 18, 2026: 22 tables, 15 functions and 50 policies. It is a schema snapshot, not the original historical migrations 001–016A. Regenerate with `node scripts/generate-baseline.mjs supabase/baselines/catalog_before_018.json`.
 
-The verification script is for the development database and references its existing test users and event. It runs in a transaction that ends in rollback. Do not treat it as a production seed script.
+For a fresh Supabase database only, apply the baseline first, then files in `supabase/migrations/` in filename order. The baseline assumes Supabase provides Auth and database roles. It contains no user/business records, Auth settings, secrets or storage configuration. A plain `supabase db reset` does not include this separate baseline automatically.
 
-## Preserved product decisions
+Do not apply the baseline or replay already-applied migrations on arenax-dev. Recorded migration versions match the live database; original 017 files are preserved. Automated cloud deployment is not configured.
 
-One backend and identity system serves mobile and web. The four everyday roles are Organizer/Admin, Captain/Team Manager, Event Staff/Official, and Player/Participant. Super Admin is an internal permission; SCORER and CHECK_IN are event staff assignments. Examples use Indian states and international teams.
+## Documentation
 
-No frontend application is included yet. See the handoff for existing security findings and the check-in API contract.
+- [Security verification and website roadmap](outputs/018_security_and_website_roadmap.md)
+- [Check-in API and original backend handoff](outputs/ArenaX_backend_handoff.md)
+- [Original applied migration export](outputs/Applied_017_export.md)
+
+One identity system serves web and mobile. Everyday roles remain Organizer/Admin, Captain/Team Manager, Event Staff/Official and Player/Participant. Super Admin is internal; SCORER and CHECK_IN are event staff assignments. Examples use Indian states and international teams.

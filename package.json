@@ -1,0 +1,7 @@
+{
+  "name": "arenax-backend",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node scripts/verify-database.mjs" },
+  "devDependencies": { "@electric-sql/pglite": "0.5.10" }
+}
