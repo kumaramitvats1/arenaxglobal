@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {workspaces,safeRoute,escapeHTML,calendarDate} from '../src/model.js';
+test('scorer cannot acquire captain or organizer navigation',()=>assert.deepEqual(workspaces({profile:{account_status:'ACTIVE'},roles:[{role:'CAPTAIN',status:'INACTIVE'}],staff:[{status:'CONFIRMED',staff_role:'SCORER'}]}),['staff','player']));
+test('suspended accounts have no workspace',()=>assert.deepEqual(workspaces({profile:{account_status:'SUSPENDED'},roles:[{role:'SUPER_ADMIN',status:'ACTIVE'}]}),[]));
+test('revoked staff assignment has no staff workspace',()=>assert.deepEqual(workspaces({profile:{account_status:'ACTIVE'},staff:[{status:'CANCELLED'}]}),['player']));
+test('multiple actual memberships combine without self-selection',()=>assert.deepEqual(workspaces({profile:{account_status:'ACTIVE'},roles:[{role:'ORGANIZER',status:'ACTIVE'}],captainTeams:[{id:'team'}],staff:[{status:'ASSIGNED'}]}),['organizer','captain','staff','player']));
+test('return locations reject external URLs and malformed routes',()=>{for(const value of ['https://evil.test','//evil.test','#/event/x?redirect=evil','#/admin',null])assert.equal(safeRoute(value),'#/dashboard');assert.equal(safeRoute('#/event/123-ab'),'#/event/123-ab');});
+test('untrusted names cannot inject markup',()=>assert.equal(escapeHTML('<img src=x onerror="x">'), '&lt;img src=x onerror=&quot;x&quot;&gt;'));
+test('calendar dates do not drift with local timezone',()=>assert.equal(calendarDate('2027-02-06'),'6 Feb 2027'));

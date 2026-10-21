@@ -1,6 +1,6 @@
 # ArenaX Global
 
-Shared Supabase backend for the web and mobile MVP. No frontend is included yet.
+Shared Supabase backend for the web and mobile MVP. The first web portal is in web/: Auth forms, profile onboarding, role-aware dashboards and read-only event/match details. See [web setup and verification limits](web/README.md).
 
 ## Current status
 
@@ -25,6 +25,8 @@ For a fresh Supabase database only, apply the baseline first, then files in `sup
 Do not apply the baseline or replay already-applied migrations on arenax-dev. Recorded migration versions match the live database; original 017 files are preserved. Automated cloud deployment is not configured.
 
 ## Documentation
+
+- [Website page map and first-release brief](outputs/Website_plan.md)
 
 - [Security verification and website roadmap](outputs/018_security_and_website_roadmap.md)
 - [Check-in API and original backend handoff](outputs/ArenaX_backend_handoff.md)

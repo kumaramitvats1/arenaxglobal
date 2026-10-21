@@ -1,0 +1,7 @@
+node_modules/
+.env*
+!.env.example
+.sites-local/
+dist/app.js
+dist/app.js.map
+dist/app.js.LEGAL.txt
