@@ -1,0 +1,65 @@
+begin;
+create temporary table setup_results(test text);
+grant all on setup_results to authenticated,anon;
+do $$ declare org uuid; sport uuid; begin
+ insert into public.organizations(name,slug) values('Texas setup test','texas-'||gen_random_uuid()) returning id into org;
+ select id into sport from public.sports where active limit 1;
+ perform set_config('arenax.setup_org',org::text,true);
+ perform set_config('arenax.setup_payload',jsonb_build_object('organization_id',org,'sport_id',sport,'event_name','Austin Community Cup','start_date','2027-03-10','end_date','2027-03-12','registration_type','TEAM','pricing_model','PER_TEAM','currency','USD','registration_fee',150,'status','DRAFT')::text,true);
+end; $$;
+select set_config('request.jwt.claim.sub','a289ed2b-99c9-4aad-affc-d3ca89ebcfbb',true);
+set local role authenticated;
+do $$ begin
+ begin perform public.save_event_setup(current_setting('arenax.setup_payload')::jsonb); raise exception 'Scorer created event'; exception when insufficient_privilege then null; end;
+ insert into setup_results values('scorer cannot create event');
+end; $$;
+reset role;
+insert into public.user_roles(user_id,organization_id,role,status) values('a289ed2b-99c9-4aad-affc-d3ca89ebcfbb',current_setting('arenax.setup_org')::uuid,'ORGANIZER','ACTIVE');
+set local role authenticated;
+do $$ declare eid uuid; payload jsonb:=current_setting('arenax.setup_payload')::jsonb; oldstamp timestamptz; begin
+ eid:=public.save_event_setup(payload); perform set_config('arenax.setup_event',eid::text,true);
+ insert into setup_results values('organizer creates draft');
+ select updated_at into oldstamp from public.events where id=eid;
+ perform set_config('arenax.setup_stamp',oldstamp::text,true);
+ if jsonb_array_length(public.get_event_catalog(eid))<>0 then raise exception 'Draft leaked'; end if;
+ insert into setup_results values('catalog excludes draft even for organizer');
+ perform public.save_event_setup(payload||'{"event_name":"Austin Updated Cup"}',eid,oldstamp);
+ insert into setup_results values('organizer edits own draft');
+ begin perform public.save_event_setup(payload,eid,oldstamp); raise exception 'Stale update accepted'; exception when serialization_failure then null; end;
+ insert into setup_results values('stale editor rejected');
+ begin perform public.save_event_setup(payload||'{"registration_fee":-1}'); raise exception 'Negative fee accepted'; exception when invalid_parameter_value then null; end;
+ insert into setup_results values('negative fee rejected');
+ begin perform public.save_event_setup(payload||'{"end_date":"2027-03-01"}'); raise exception 'Reversed dates accepted'; exception when invalid_parameter_value then null; end;
+ insert into setup_results values('reversed dates rejected');
+ begin perform public.save_event_setup(payload||'{"status":"COMPLETED"}'); raise exception 'Lifecycle bypass accepted'; exception when invalid_parameter_value then null; end;
+ insert into setup_results values('setup cannot complete tournament');
+ begin perform public.save_event_setup(payload||'{"organization_id":"00000000-0000-0000-0000-000000000001"}'); raise exception 'Cross organization write'; exception when insufficient_privilege then null; end;
+ insert into setup_results values('cross organization rejected');
+ select updated_at into oldstamp from public.events where id=eid;
+ perform public.save_event_setup(payload||'{"status":"PUBLISHED"}',eid,oldstamp);
+ insert into setup_results values('organizer publishes own draft');
+ begin perform public.save_event_setup(payload,eid,oldstamp); raise exception 'Published event edited'; exception when invalid_parameter_value then null; end;
+ insert into setup_results values('published event protected by setup API');
+end; $$;
+reset role;
+set local role anon;
+do $$ declare result jsonb; begin
+ result:=public.get_event_catalog(current_setting('arenax.setup_event')::uuid);
+ if jsonb_array_length(result)<>1 or result->0->>'currency'<>'USD' then raise exception 'Public catalog failed'; end if;
+ if (result->0) ?| array['created_by','organization_id','registrations','staff','user_id'] then raise exception 'Private fields exposed'; end if;
+ insert into setup_results values('anonymous projection returns only public event fields');
+ begin perform public.save_event_setup(current_setting('arenax.setup_payload')::jsonb); raise exception 'Anonymous write succeeded'; exception when insufficient_privilege then null; end;
+ insert into setup_results values('anonymous setup execution denied');
+ begin perform 1 from public.events; raise exception 'Anonymous table access succeeded'; exception when insufficient_privilege then null; end;
+ insert into setup_results values('anonymous direct table access remains denied');
+end; $$;
+reset role;
+update public.profiles set account_status='SUSPENDED' where id='a289ed2b-99c9-4aad-affc-d3ca89ebcfbb';
+set local role authenticated;
+do $$ begin
+ begin perform public.save_event_setup(current_setting('arenax.setup_payload')::jsonb); raise exception 'Suspended organizer write'; exception when insufficient_privilege then null; end;
+ insert into setup_results values('suspended organizer denied');
+end; $$;
+reset role;
+select jsonb_build_object('passed',count(*),'tests',jsonb_agg(test order by test)) as verification from setup_results;
+rollback;

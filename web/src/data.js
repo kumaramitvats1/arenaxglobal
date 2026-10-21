@@ -11,10 +11,17 @@ export async function loadAccount(){
  supabase.from('teams').select('id,event_id,team_name,captain_user_id'),
  supabase.from('team_members').select('team_id,team_role,status,invitation_status').eq('user_id',user.id).eq('status','ACTIVE').eq('invitation_status','ACCEPTED'),
  supabase.from('registrations').select('id,event_id,registration_status,payment_status,registration_type').eq('user_id',user.id),
- supabase.from('events').select('id,event_name,description,status,start_date,end_date,organization_id,sport_id,venue_id,registration_type,registration_fee,currency,pricing_model,sports(name),venues(name,city,country)').order('start_date',{ascending:false})]);
+ supabase.from('events').select('id,event_name,description,status,updated_at,start_date,end_date,organization_id,sport_id,venue_id,registration_type,registration_fee,currency,pricing_model,sports(name),venues(name,city,country)').order('start_date',{ascending:false})]);
  const r=unwrap(roles),t=unwrap(teams);
  return {user,profile,roles:r,staff:unwrap(staff),teams:t,members:unwrap(members),registrations:unwrap(registrations),events:unwrap(events),captainTeams:t.filter(t=>t.captain_user_id===user.id||r.some(r=>r.role==='CAPTAIN'&&r.team_id===t.id))};
 }
 export async function loadMatches(id){return unwrap(await supabase.from('matches').select('id,match_code,stage,status,home_team_id,away_team_id,winner_team_id,scheduled_start').eq('event_id',id).order('match_number'));}
+export async function loadCatalog(id=null,offset=0){return unwrap(await supabase.rpc('get_event_catalog',{p_event_id:id,p_offset:offset}));}
+export async function loadSetupOptions(account){
+ const [org,sports,venues]=await Promise.all([supabase.from('organizations').select('id,name'),supabase.from('sports').select('id,name').eq('active',true),supabase.from('venues').select('id,name,city,state,country,organization_id').eq('active',true)]);
+ const organizations=unwrap(org).filter(o=>account.roles.some(r=>r.role==='SUPER_ADMIN'||r.role==='ORGANIZER'&&r.organization_id===o.id));
+ return {organizations,sports:unwrap(sports),venues:unwrap(venues)};
+}
+export async function saveEvent(payload,event=null){return unwrap(await supabase.rpc('save_event_setup',{p_payload:payload,p_event_id:event?.id||null,p_expected_updated_at:event?.updated_at||null}));}
 export async function saveProfile(user,first,last){const row=unwrap(await supabase.from('profiles').update({first_name:first,last_name:last}).eq('id',user.id).select('id').single());if(!row)throw new Error('Your profile could not be saved.');}
 export const demoAccount={user:{id:'sample-player',email:'sample@arenax.example'},profile:{first_name:'Alex',last_name:'Morgan',account_status:'ACTIVE'},roles:[],staff:[{event_id:'sample-cup',staff_role:'SCORER',status:'CONFIRMED'}],teams:[{id:'sample-austin',event_id:'sample-cup',team_name:'Austin'}],captainTeams:[],members:[{team_id:'sample-austin',status:'ACTIVE',invitation_status:'ACCEPTED'}],registrations:[],events:[{id:'sample-cup',event_name:'ArenaX Texas Cricket Cup 2027',description:'A celebration of Texas cricket, team spirit and local competition. This sample event illustrates the portal; sign in to see the current tournament records.',status:'COMPLETED',start_date:'2027-02-06',end_date:'2027-02-14',registration_type:'TEAM',registration_fee:150,currency:'USD',pricing_model:'PER_TEAM',sports:{name:'Cricket'},venues:{name:'Sample Texas cricket ground',city:'Austin, Texas',country:'USA'}}]};

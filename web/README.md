@@ -4,7 +4,7 @@ Static JavaScript portal with a bundled, pinned Supabase client. Uses the existi
 
 Run npm ci, npm run build, npm test, then npm run dev in this directory. Preview: http://127.0.0.1:4173. Routing uses URL fragments so deployment does not need server route rewrites. Build emits dist/app.js; HTML/CSS are authored directly in dist/. The Sites manifest points to dist/.
 
-Implemented: password sign-in, sign-up/confirmation/resend, password recovery, profile names, assignment-based workspaces, event search/detail, and read-only match results. Sample tour supports visual inspection without an account. Scoring, registration, checkout and check-in controls are intentionally not included in this milestone.
+Implemented: password sign-in, sign-up/confirmation/resend, password recovery, profile names, assignment-based workspaces, event search/detail, read-only match results, signed-out event discovery and organizer draft/edit/publish setup. Sample tour supports visual inspection without an account. Scoring, registration, checkout and check-in controls are not included yet.
 
 ## Auth deployment configuration
 
@@ -16,7 +16,7 @@ Private Sites hosting adds an owner-access gate around this preview. It is not a
 
 Only first_name and last_name are updated, on the authenticated user's profile; migration 018 independently protects identity/status fields. Own roles, staff assignments, accepted memberships and own registrations are filtered by user ID and subject to existing RLS. Events/teams/matches use the existing authenticated read policies; only required columns are requested. Captain navigation uses captain_user_id or active CAPTAIN membership, matching the existing helper's actual captain branches. Organizer navigation uses active ORGANIZER membership; Super Admin receives a separate internal workspace.
 
-The UI re-fetches account status/assignments on protected navigation and focus. Hiding navigation is not a permission mechanism. No membership, role, payment, waiver or tournament writes are added. Existing broad authenticated event/team read policies are preserved; public browsing remains closed. Later roster/waiver/scoring write audits remain separate work.
+The UI re-fetches account status/assignments on protected navigation and focus, except while editing a form to preserve unsaved input. Hiding navigation is not a permission mechanism. No membership, role, payment, waiver or tournament-result writes are added. Existing authenticated event/team read policies are preserved. The signed-out directory uses only get_event_catalog; direct anonymous table access stays denied. Later roster/waiver/scoring write audits remain separate work.
 
 ## Verification limits
 
