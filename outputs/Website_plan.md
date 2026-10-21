@@ -8,7 +8,7 @@ Deliver a connected journey: sign in → complete profile → see authorized das
 
 ## Fixed product boundaries
 
-One Supabase identity/backend serves web and mobile. Everyday workspaces are Organizer/Admin, Captain/Team Manager, Event Staff/Official and Player/Participant. Super Admin is internal. SCORER and CHECK_IN remain event assignments. Workspace selection changes the view, never permissions. Preserve the existing migrations, completed tournament, fee model and versioned waivers. Use Indian state and international examples.
+One Supabase identity/backend serves web and mobile. Everyday workspaces are Organizer/Admin, Captain/Team Manager, Event Staff/Official and Player/Participant. Super Admin is internal. SCORER and CHECK_IN remain event assignments. Workspace selection changes the view, never permissions. Preserve the existing migrations, completed tournament, fee model and versioned waivers. Per the October 21 update, website sample data uses Texas, USA and USD. Existing live event records retain their stored location and currency.
 
 ## Page map
 
