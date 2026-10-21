@@ -26,16 +26,16 @@ Source: web/ in kumaramitvats1/arenaxglobal. Sites publishes an isolated release
 
 ## Still pending
 
-The browser is not signed into the Supabase dashboard. Verify/add these exact allowed redirect URLs under Authentication → URL Configuration, preserving existing entries:
+Configured and verified in the Supabase dashboard on October 21: the default Site URL is the hosted portal root, and both hosted redirects below are saved. Localhost entries are optional development configuration and were not added:
 
 - https://arenax-global-portal.trueraven12.chatgpt.site/
 - https://arenax-global-portal.trueraven12.chatgpt.site/?recovery=1
 - http://127.0.0.1:4173/
 - http://127.0.0.1:4173/?recovery=1
 
-The connected Supabase tools do not expose Auth URL settings. Real sign-in, email confirmation, recovery and profile-write browser round trips have not been completed with a user's account. These remain acceptance checks, not claimed passes. Do not share passwords in chat; enter credentials directly in the app. Open PKCE email links in the browser that initiated them.
+Auth URL settings were saved through the dashboard with user approval. Real sign-in, email confirmation, recovery and profile-write browser round trips have not been completed with a user's account. These remain acceptance checks, not claimed passes. Do not share passwords in chat; enter credentials directly in the app. Open PKCE email links in the browser that initiated them.
 
 Before public onboarding: configure email delivery and leaked-password protection, complete the remaining write-permission audits, and explicitly choose a public deployment audience. This release does not implement registration, payment, scoring writes or check-in screens.
 
-Deployment ID: appgdep_6ad8bb994db081918a4169ce205a23b1.
-Site source commit: c0778e5d600a9ac62d990048f6508ceb7089b1c9.
+Deployment ID: appgdep_6ad8bca8fed48191bf9278c33c3c45fe.
+Site source commit: 9c43c2b039867529007a5f837743db3acff1aa9d.
