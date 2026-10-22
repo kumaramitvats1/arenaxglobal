@@ -92,3 +92,7 @@ The existing tournament remains completed. Create separate development fixtures 
 7. Launch: multi-role end-to-end tests, production Auth settings including leaked-password protection, backups, monitoring and deployment.
 
 Next implementation deliverable: a reviewable preview of milestone 1. Payment provider, production domain and production hosting are not selected by this plan.
+
+## October 22 progress
+
+Milestones 1–3 are implemented. Stripe payments (milestone 4) are deferred by the user. The first milestone 5 slice adds fixtures/standings, cricket scoring, scheduling existing fixtures and organizer progression. Fixture creation, other sport scoring and check-in screens are still pending. See Website_tournament_release.md.

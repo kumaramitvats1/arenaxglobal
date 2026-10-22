@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {scoreable,overs,scorePayload,progression} from '../src/tournament-model.js';
+import {safeRoute} from '../src/model.js';
+const m={id:'match',stage:'GROUP',status:'READY',result_status:'PENDING',home_team_id:'a',away_team_id:'b'};
+const valid={home_runs:'80',home_wickets:'4',home_balls:'48',away_runs:'81',away_wickets:'3',away_balls:'47',max_balls:'48'};
+test('score entry excludes completed and unresolved matches',()=>{assert.equal(scoreable(m),true);assert.equal(scoreable({...m,status:'COMPLETED'}),false);assert.equal(scoreable({...m,away_team_id:null}),false);assert.equal(scoreable({...m,result_status:'CONFIRMED'}),false);});
+test('balls display as cricket overs without decimal arithmetic',()=>{assert.equal(overs(47),'7.5');assert.equal(overs(48),'8.0');});
+test('score payload rejects missing, decimal and excessive fields',()=>{assert.equal(scorePayload(valid,m).p_away_runs,81);for(const bad of [{home_runs:''},{home_runs:'1.5'},{home_wickets:'11'},{away_balls:'49'},{home_balls:'0'},{max_balls:'601'}])assert.throws(()=>scorePayload({...valid,...bad},m));});
+test('unresolved knockout ties cannot be confirmed',()=>{assert.throws(()=>scorePayload({...valid,away_runs:'80'},{...m,stage:'FINAL'}));assert.equal(scorePayload({...valid,away_runs:'80'},m).p_away_runs,80);});
+test('completion requires confirmed final and no unfinished competition',()=>{const final={...m,stage:'FINAL',status:'COMPLETED',result_status:'CONFIRMED',winner_team_id:'a'};assert.equal(progression([final]).complete,true);assert.equal(progression([final,m]).complete,false);assert.equal(progression([{...final,result_status:'PENDING'}]).complete,false);});
+test('tournament return path stays inside portal',()=>{assert.equal(safeRoute('#/tournament/abc-123'),'#/tournament/abc-123');assert.equal(safeRoute('#/tournament/https://evil.test'),'#/dashboard');});
