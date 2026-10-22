@@ -37,7 +37,7 @@ try {
  values(o,s,'ArenaX India States Cricket Cup 2027',current_date,current_date,'TEAM','COMPLETED');
  end; $$;
  `);
- for (const path of ['outputs/017_verification.sql','supabase/tests/018_security.sql','supabase/tests/019_event_setup.sql','supabase/tests/020_enrollment.sql','supabase/tests/021_tournament.sql','supabase/tests/022_fixtures.sql']) {
+ for (const path of ['outputs/017_verification.sql','supabase/tests/018_security.sql','supabase/tests/019_event_setup.sql','supabase/tests/020_enrollment.sql','supabase/tests/021_tournament.sql','supabase/tests/022_fixtures.sql','supabase/tests/023_check_in_desk.sql']) {
    const results=await db.exec(fs.readFileSync(path,'utf8'));
    const summary=results.flatMap(r=>r.rows).find(r=>r.verification)?.verification;
    assert.ok(summary?.passed>0,'No verification summary: '+path);

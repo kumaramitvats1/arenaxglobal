@@ -23,3 +23,5 @@ The UI re-fetches account status/assignments on protected navigation and focus, 
 Unit tests cover revoked/suspended/multiple-role navigation, safe return routes, HTML escaping and date handling. The root database suite verifies server authorization. A real email confirmation/recovery round trip requires the redirect allowlist and the user's mailbox; a sample tour is not proof of live authentication.
 
 Official API references: https://supabase.com/docs/reference/javascript/auth-signinwithpassword and https://supabase.com/docs/guides/auth/redirect-urls.
+
+Check-in UI and verification: see ../outputs/Website_check_in_release.md. Navigation: #/check-in and #/check-in/:eventId.
