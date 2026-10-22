@@ -96,3 +96,5 @@ Next implementation deliverable: a reviewable preview of milestone 1. Payment pr
 ## October 22 progress
 
 Milestones 1–3 are implemented. Stripe payments (milestone 4) are deferred by the user. The first milestone 5 slice adds fixtures/standings, cricket scoring, scheduling existing fixtures and organizer progression. Fixture creation, other sport scoring and check-in screens are still pending. See Website_tournament_release.md.
+
+Cricket-only scope confirmed by the user. Cricket fixture assignment/preview/generation is implemented by migration 022. Volleyball scoring and Stripe remain deferred. Next cricket milestone: participant QR passes and check-in screens. See Website_cricket_fixtures.md.

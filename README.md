@@ -4,7 +4,7 @@ Shared Supabase backend for the web and mobile MVP. The portal in web/ includes 
 
 ## Current status
 
-Migration 021 is applied to arenax-dev. On October 22, 2026, all 152 database checks passed locally and live: 35 check-in, 41 sensitive-field/authorization, 15 event setup/catalog 36 enrollment and 25 tournament tests. Existing application data checksums were unchanged. The completed tournament remains intact.
+Migration 022 is applied to arenax-dev. On October 22, 2026, all 174 database checks passed locally and live: 35 check-in, 41 sensitive-field/authorization, 15 event setup/catalog 36 enrollment, 25 tournament and 22 fixture-setup tests. Existing application data checksums were unchanged. The completed tournament remains intact.
 
 - 016B: Hotmail development account converted from captain to event SCORER.
 - 017/017B: authorized manual/QR check-in, attendance audit and private hashed tokens.
@@ -14,11 +14,13 @@ Migration 021 is applied to arenax-dev. On October 22, 2026, all 152 database ch
 
 - 021: guarded cricket scoring, confirmed-result locks, schedule validation and organizer tournament progression.
 
+- 022: cricket group assignment, approved-team validation and repeat-safe fixture generation.
+
 ## Test locally
 
 Use Node.js 22 or later: run `npm ci`, then `npm test`.
 
-Tests restore the legacy schema and replay all migrations in isolated PGlite PostgreSQL, then run five rollback-only SQL suites. No cloud credentials are needed. Tests simulate database roles and JWT claims; they do not test Supabase Auth sign-in, HTTP transport, browser UI or concurrent connections.
+Tests restore the legacy schema and replay all migrations in isolated PGlite PostgreSQL, then run six rollback-only SQL suites. No cloud credentials are needed. Tests simulate database roles and JWT claims; they do not test Supabase Auth sign-in, HTTP transport, browser UI or concurrent connections.
 
 ## Database bootstrap
 
@@ -29,6 +31,8 @@ For a fresh Supabase database only, apply the baseline first, then files in `sup
 Do not apply the baseline or replay already-applied migrations on arenax-dev. Recorded migration versions match the live database; original 017 files are preserved. Automated cloud deployment is not configured.
 
 ## Documentation
+
+- [Cricket fixture setup and remaining scope](outputs/Website_cricket_fixtures.md)
 
 - [Tournament release and remaining work](outputs/Website_tournament_release.md)
 
